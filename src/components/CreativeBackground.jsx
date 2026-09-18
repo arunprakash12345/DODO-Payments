@@ -2,18 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { lerp, clamp } from '../utils/animation';
 import { playMoteSpawnSound, playMoteAbsorbSound } from '../utils/audio';
 
-/**
- * Creative Interactive Background — Spatial Bio-Resonance & Topographic Living Membrane
- * Features:
- * 1. Interactive Light Mote Toy: Click anywhere to drop a light mote; companion tracks and absorbs it.
- * 2. Elastic Topographic Gravity Well: Living contour isolines that depress under creature weight and shear during drag.
- * 3. Acoustic Purr Cymatics: Waveforms radiating across the membrane during petting.
- * 4. Ambient studio lighting and museum-grade tactile paper texture.
- */
 export function CreativeBackground({
   theme,
   emotionRef,
-  scenario = 'none', // 'none' | 'success' | 'failure' | 'network'
+  scenario = 'none',
   rippleTrigger = 0,
   onMoteAbsorbed = null
 }) {
@@ -25,7 +17,6 @@ export function CreativeBackground({
     smoothX: 0,
     smoothY: 0,
     time: 0,
-    // Emotional interpolation values
     curH: 42,
     curS: 18,
     curL: 96,
@@ -35,23 +26,16 @@ export function CreativeBackground({
     orbHue: 44,
     orbAlpha: 0.45,
     orbScale: 1,
-    // Interactive Light Motes (Fireflies / Food)
     motes: [],
-    // Sparkle bursts on absorption
     sparks: [],
-    // Floor ripples
     ripples: [],
-    // Purr harmonic wave timer
     lastPurrWave: 0,
     purrWaves: [],
-    // Payment Scenario waves (Sonar / Celebratory rings)
     lastScenarioWave: 0,
     scenarioWaves: []
   });
 
-  // Handle click on canvas background to spawn a Light Mote
   const handleCanvasClick = (e) => {
-    // Only spawn if click didn't originate on the creature itself
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
@@ -62,11 +46,9 @@ export function CreativeBackground({
     const centerY = rect.height / 2;
     const distToCenter = Math.sqrt((clickX - centerX) ** 2 + (clickY - centerY) ** 2);
 
-    // If clicked outside creature core radius (> 90px), spawn a light mote!
     if (distToCenter > 90) {
       playMoteSpawnSound();
 
-      // Max 6 motes at a time
       if (stateRef.current.motes.length >= 6) {
         stateRef.current.motes.shift();
       }
@@ -84,7 +66,6 @@ export function CreativeBackground({
         life: 0
       });
 
-      // Spawn subtle water droplet ripple
       stateRef.current.ripples.push({
         x: clickX,
         y: clickY,
@@ -97,7 +78,6 @@ export function CreativeBackground({
     }
   };
 
-  // Track pointer for studio light follow
   useEffect(() => {
     const handlePointer = (e) => {
       stateRef.current.pointerX = e.clientX;
@@ -107,7 +87,6 @@ export function CreativeBackground({
     return () => window.removeEventListener('pointermove', handlePointer);
   }, []);
 
-  // Spawn interaction ripples on poke / gesture
   useEffect(() => {
     if (rippleTrigger > 0 && canvasRef.current) {
       const { width, height } = canvasRef.current;
@@ -134,7 +113,6 @@ export function CreativeBackground({
     }
   }, [rippleTrigger, emotionRef]);
 
-  // Handle Payment Scenario Shifts (Waves & Golden Mote Bursts)
   useEffect(() => {
     const s = stateRef.current;
     const width = window.innerWidth;
@@ -143,7 +121,6 @@ export function CreativeBackground({
     const centerY = height / 2;
 
     if (scenario === 'success') {
-      // Celebratory expanding rings
       s.scenarioWaves.push({
         type: 'success',
         x: centerX,
@@ -165,7 +142,6 @@ export function CreativeBackground({
         color: 'rgba(245, 158, 11, '
       });
 
-      // Spawn 3 golden prosperity motes
       for (let i = 0; i < 3; i++) {
         const ang = (Math.PI * 2 * i) / 3 + 0.3;
         s.motes.push({
@@ -182,7 +158,6 @@ export function CreativeBackground({
         });
       }
     } else if (scenario === 'failure') {
-      // Gentle warning soft coral ripples
       s.scenarioWaves.push({
         type: 'failure',
         x: centerX,
@@ -194,7 +169,6 @@ export function CreativeBackground({
         color: 'rgba(244, 63, 94, '
       });
     } else if (scenario === 'network') {
-      // Clear extra motes and send initial sonar pulse
       s.motes = [];
       s.scenarioWaves.push({
         type: 'sonar',
@@ -236,7 +210,6 @@ export function CreativeBackground({
       const centerX = width / 2;
       const centerY = height / 2;
 
-      // Read real-time emotion state
       const emo = emotionRef?.current || {
         state: 'calm',
         bliss: 0,
@@ -248,7 +221,6 @@ export function CreativeBackground({
         dragVector: { x: 0, y: 0 }
       };
 
-      // 1. Emotional Color Targets (Responsive to Payment Scenarios & Bio-resonance)
       if (emo.state === 'payment_success' || scenario === 'success') {
         s.targetH = 156; s.targetS = 36; s.targetL = 94;
         s.orbHue = 152; s.orbAlpha = 0.72; s.orbScale = 1.48;
@@ -278,7 +250,6 @@ export function CreativeBackground({
         s.orbHue = 42; s.orbAlpha = 0.45; s.orbScale = 1.0;
       }
 
-
       s.curH = lerp(s.curH, s.targetH, 0.04);
       s.curS = lerp(s.curS, s.targetS, 0.04);
       s.curL = lerp(s.curL, s.targetL, 0.04);
@@ -288,14 +259,12 @@ export function CreativeBackground({
 
       ctx.clearRect(0, 0, width, height);
 
-      // 2. Base Bio-Resonant Field Background
       const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
       bgGrad.addColorStop(0, `hsl(${s.curH}, ${s.curS}%, ${Math.min(99, s.curL + 2)}%)`);
       bgGrad.addColorStop(1, `hsl(${s.curH}, ${s.curS + 6}%, ${Math.max(90, s.curL - 3)}%)`);
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // 3. Elastic Topographic Gravity Well Isolines
       const dragVx = emo.dragVector?.x || 0;
       const dragVy = emo.dragVector?.y || 0;
       const creatureX = centerX + dragVx * 0.4;
@@ -308,7 +277,6 @@ export function CreativeBackground({
         const breathDistort = Math.sin(s.time * 1.6 + i * 0.5) * (3 + i * 0.6);
         const purrCymatic = emo.state === 'bliss' ? Math.sin(s.time * 8 + i * 0.8) * 3.5 : 0;
 
-        // Pointer wake displacement
         const dxP = s.smoothX - creatureX;
         const dyP = s.smoothY - creatureY;
         const distP = Math.sqrt(dxP * dxP + dyP * dyP);
@@ -327,7 +295,6 @@ export function CreativeBackground({
       }
       ctx.restore();
 
-      // 4. Studio Light Orb with Anisotropic Tension Stretch
       const auraX = creatureX + (s.smoothX - centerX) * 0.07;
       const auraY = creatureY + (s.smoothY - centerY) * 0.07;
       const baseRadius = Math.max(260, Math.min(width, height) * 0.44) * s.orbScale;
@@ -352,7 +319,6 @@ export function CreativeBackground({
       ctx.fill();
       ctx.restore();
 
-      // 5. Purr Waves in Bliss Mode
       if (emo.state === 'bliss') {
         const now = Date.now();
         if (now - s.lastPurrWave > 450) {
@@ -377,7 +343,6 @@ export function CreativeBackground({
         if (pw.radius >= pw.maxRadius) s.purrWaves.splice(i, 1);
       }
 
-      // 6. Interactive Light Motes Simulation (Drift, Attraction, and Absorption)
       let closestMote = null;
       let closestDist = Infinity;
 
@@ -386,7 +351,6 @@ export function CreativeBackground({
         m.life += 1;
         m.phase += m.pulseSpeed;
 
-        // Gravitational attraction toward creature center
         const dx = creatureX - m.x;
         const dy = creatureY - m.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -396,7 +360,6 @@ export function CreativeBackground({
           closestMote = { x: m.x, y: m.y, dist };
         }
 
-        // Soft drift towards companion
         const attractForce = clamp(0.35 / (dist + 50), 0.0005, 0.008);
         m.vx += dx * attractForce + Math.sin(m.phase) * 0.18;
         m.vy += dy * attractForce + Math.cos(m.phase) * 0.18;
@@ -407,11 +370,9 @@ export function CreativeBackground({
         m.x += m.vx;
         m.y += m.vy;
 
-        // Draw Light Mote
         const pulse = 1 + Math.sin(m.phase) * 0.25;
         const moteAlpha = Math.min(1, m.life / 30);
 
-        // Halo
         const moteGlow = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 22 * pulse);
         moteGlow.addColorStop(0, `hsla(${m.hue}, 95%, 65%, ${0.6 * moteAlpha})`);
         moteGlow.addColorStop(0.5, `hsla(${m.hue}, 90%, 75%, ${0.2 * moteAlpha})`);
@@ -422,17 +383,14 @@ export function CreativeBackground({
         ctx.arc(m.x, m.y, 22 * pulse, 0, Math.PI * 2);
         ctx.fill();
 
-        // Core Spark
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(m.x, m.y, m.radius * pulse * 0.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Check if absorbed by creature! (Within creature collision boundary ~68px)
         if (dist < 68) {
           playMoteAbsorbSound();
 
-          // Spawn celebratory sparks
           for (let k = 0; k < 14; k++) {
             const angle = (Math.PI * 2 * k) / 14 + (Math.random() - 0.5) * 0.4;
             const spd = 1.2 + Math.random() * 2.5;
@@ -447,7 +405,6 @@ export function CreativeBackground({
             });
           }
 
-          // Trigger ripple from mouth
           s.ripples.push({
             x: creatureX,
             y: creatureY,
@@ -458,19 +415,16 @@ export function CreativeBackground({
             color: 'rgba(251, 191, 36, '
           });
 
-          // Notify parent of absorption
           if (onMoteAbsorbed) onMoteAbsorbed();
 
           s.motes.splice(i, 1);
         }
       }
 
-      // Stream closest mote to companion's gaze
       if (emotionRef?.current) {
         emotionRef.current.nearestMote = closestMote;
       }
 
-      // 7. Render Absorption Sparks
       for (let i = s.sparks.length - 1; i >= 0; i--) {
         const sp = s.sparks[i];
         sp.life++;
@@ -488,7 +442,6 @@ export function CreativeBackground({
         if (sp.life >= sp.maxLife) s.sparks.splice(i, 1);
       }
 
-      // 8. Periodic Payment Scenario Waves (Sonar Radar Pulse / Celebratory Rings)
       const nowTime = Date.now();
       if (scenario === 'network' && nowTime - s.lastScenarioWave > 1300) {
         s.scenarioWaves.push({
@@ -516,7 +469,6 @@ export function CreativeBackground({
         s.lastScenarioWave = nowTime;
       }
 
-      // 9. Render Payment Scenario Waves
       for (let i = s.scenarioWaves.length - 1; i >= 0; i--) {
         const sw = s.scenarioWaves[i];
         sw.radius += sw.speed;
@@ -539,7 +491,6 @@ export function CreativeBackground({
         if (sw.radius >= sw.maxRadius) s.scenarioWaves.splice(i, 1);
       }
 
-      // 10. Render Floor Ripples
       for (let i = s.ripples.length - 1; i >= 0; i--) {
         const r = s.ripples[i];
         r.radius += r.speed;
@@ -574,13 +525,8 @@ export function CreativeBackground({
       title="Click anywhere to drop a light mote for the companion"
       aria-label="Interactive background canvas. Click anywhere to drop a light mote."
     >
-      {/* Dynamic Bio-Resonance Light & Fluid Canvas */}
       <canvas ref={canvasRef} className="bg-canvas" />
-
-      {/* Studio Depth Vignette */}
       <div className="studio-vignette" />
-
-      {/* Meta Design System Editorial Marks (Dodo Payments Context) */}
       <div className="studio-marks">
         <span className="mark-cross mark-tl">+</span>
         <span className="mark-cross mark-tr">+</span>
@@ -589,10 +535,7 @@ export function CreativeBackground({
         <span className="mark-meta mark-meta-left">DODO PAYMENTS · EMOTIONAL INTERACTION ENGINE</span>
         <span className="mark-meta mark-meta-right">LIVING RESILIENCE MEMBRANE · TAP TO FEED</span>
       </div>
-
-      {/* Museum Paper Grain */}
       <div className="paper-grain" />
     </div>
   );
 }
-

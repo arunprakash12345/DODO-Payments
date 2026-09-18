@@ -102,9 +102,8 @@ export default function App() {
   const [rippleTrigger, setRippleTrigger] = useState(0);
   const [absorbedTrigger, setAbsorbedTrigger] = useState(0);
   const [emotionState, setEmotionState] = useState('calm');
-  const [scenario, setScenario] = useState('none'); // 'none' | 'success' | 'failure' | 'network'
+  const [scenario, setScenario] = useState('none');
 
-  // Shared 60fps emotion telemetry ref (completely decouples canvas from React re-renders)
   const emotionRef = useRef({
     state: 'calm',
     scenario: 'none',
@@ -131,7 +130,6 @@ export default function App() {
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
-  // Keyboard shortcut listener for testing payment scenarios (1, 2, 3, 0)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -190,7 +188,6 @@ export default function App() {
       }}
       role="main"
     >
-      {/* Creative Interactive Background (Topographic Membrane + Light Motes + Bio-Resonance Field) */}
       <CreativeBackground
         theme={currentTheme}
         emotionRef={emotionRef}
@@ -199,9 +196,7 @@ export default function App() {
         onMoteAbsorbed={handleMoteAbsorbed}
       />
 
-      {/* Top Utility Controls */}
       <div className="top-utilities">
-        {/* Dodo Payments: Live Telemetry & Status Code Pill */}
         <div className={`emotion-status-pill scenario-pill-${scenario}`}>
           <span
             className="emotion-pulse-dot"
@@ -238,7 +233,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Editorial Header */}
       <header className="companion-header">
         <h1 className="companion-title">Dodo Companion</h1>
         <p className="companion-subtitle">
@@ -249,7 +243,6 @@ export default function App() {
         </p>
       </header>
 
-      {/* Main Interactive Stage */}
       <section className="stage-area" aria-label="Interactive Companion Area">
         <Companion
           isReducedMotion={isReducedMotion}
@@ -262,7 +255,6 @@ export default function App() {
         />
       </section>
 
-      {/* Dodo Payments: Dedicated Scenario Switcher Dock */}
       <nav className="payment-scenario-bar" aria-label="Payment Scenario Testing Bar">
         <button
           type="button"
@@ -309,7 +301,6 @@ export default function App() {
         </button>
       </nav>
 
-      {/* Understated Interaction Hints */}
       <footer className="companion-footer">
         <div className="hints-row" aria-label="Interaction Guide">
           <span className="hint-pill hint-action">
@@ -327,4 +318,5 @@ export default function App() {
     </main>
   );
 }
+
 

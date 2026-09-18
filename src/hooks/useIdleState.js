@@ -1,8 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 
-/**
- * Hook to manage idle behavior, autonomous gaze wandering, and natural blinking.
- */
 export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
   const idleStateRef = useRef({
     isIdle: false,
@@ -11,8 +8,7 @@ export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
     wanderTargetX: 0,
     wanderTargetY: 0,
     nextWanderTime: 0,
-    // Blinking
-    blinkProgress: 0, // 0 = open, 1 = fully closed
+    blinkProgress: 0,
     isBlinking: false,
     nextBlinkTime: Date.now() + 3000,
     isPerkedUp: false,
@@ -21,7 +17,6 @@ export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
 
   const [isIdleReactState, setIsIdleReactState] = useState(false);
 
-  // Trigger immediate wakeup/perk
   const wakeUp = useCallback(() => {
     const s = idleStateRef.current;
     if (s.isIdle) {
@@ -35,7 +30,6 @@ export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
     setIsIdleReactState(false);
   }, [pointerRef]);
 
-  // Main tick for idle state and blinking logic
   const updateIdleState = useCallback((now) => {
     const s = idleStateRef.current;
     const ptr = pointerRef.current;
@@ -54,17 +48,15 @@ export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
       }
     }
 
-    // Gaze wandering during idle
     if (s.isIdle) {
       if (now >= s.nextWanderTime) {
-        // Pick a random looking direction (up, left, right, down)
         const angles = [
-          { x: -70, y: -40 }, // look up-left
-          { x: 80, y: -50 },  // look up-right
-          { x: 0, y: -60 },   // look directly up
-          { x: -80, y: 10 },  // look left
-          { x: 80, y: 10 },   // look right
-          { x: 0, y: 0 }      // look center
+          { x: -70, y: -40 },
+          { x: 80, y: -50 },
+          { x: 0, y: -60 },
+          { x: -80, y: 10 },
+          { x: 80, y: 10 },
+          { x: 0, y: 0 }
         ];
         const choice = angles[Math.floor(Math.random() * angles.length)];
         s.wanderTargetX = choice.x;
@@ -72,7 +64,6 @@ export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
         s.nextWanderTime = now + 2400 + Math.random() * 2600;
       }
 
-      // Smoothly interpolate wander gaze
       s.wanderGazeX += (s.wanderTargetX - s.wanderGazeX) * 0.05;
       s.wanderGazeY += (s.wanderTargetY - s.wanderGazeY) * 0.05;
     } else {
@@ -80,23 +71,20 @@ export function useIdleState(pointerRef, idleTimeoutMs = 9000) {
       s.wanderGazeY = 0;
     }
 
-    // Perked up timer
     if (s.isPerkedUp && now > s.perkUpUntil) {
       s.isPerkedUp = false;
     }
 
-    // Natural Blinking Cycle
     if (now >= s.nextBlinkTime && !s.isBlinking) {
       s.isBlinking = true;
       s.blinkStartTime = now;
-      s.blinkDuration = 140; // 140ms blink
-      s.isDoubleBlink = Math.random() < 0.22; // 22% chance of double blink
+      s.blinkDuration = 140;
+      s.isDoubleBlink = Math.random() < 0.22;
     }
 
     if (s.isBlinking) {
       const elapsed = now - s.blinkStartTime;
       if (elapsed < s.blinkDuration) {
-        // Half cycle up, half down (parabolic curve)
         const progress = elapsed / s.blinkDuration;
         s.blinkProgress = Math.sin(progress * Math.PI);
       } else {

@@ -20,7 +20,7 @@ export function Companion({
   isReducedMotion = false,
   theme = {},
   emotionRef = null,
-  scenario = 'none', // 'none' | 'success' | 'failure' | 'network'
+  scenario = 'none',
   absorbedTrigger = 0,
   onEmotionChange = null,
   onInteract = null
@@ -30,14 +30,11 @@ export function Companion({
   const scenarioRef = useRef(scenario);
   scenarioRef.current = scenario;
 
-  // High performance pointer & idle hooks
   const { pointerRef, updatePointerRelative } = usePointerTracking(containerRef);
   const { idleStateRef, wakeUp, updateIdleState } = useIdleState(pointerRef);
 
-  // Micro-saccade generator
   const saccadeGenRef = useRef(new MicroSaccade());
 
-  // Petting motion tracker
   const pettingRef = useRef({
     lastX: 0,
     lastDirection: 0,
@@ -48,42 +45,34 @@ export function Companion({
     pettingLevel: 0
   });
 
-  // Expression & Physics Springs (managed in ref for 60fps animation)
   const animRef = useRef({
     baseRx: 76,
     baseRy: 82,
-    // Physics Springs
     dragSpringX: new Spring(0, 190, 13),
     dragSpringY: new Spring(0, 190, 13),
     squashSpring: new Spring(0, 240, 12),
     leanSpringX: new Spring(0, 120, 16),
     leanSpringY: new Spring(0, 120, 16),
-    // Eye Gaze
     eyeSpringX: new Spring(0, 170, 16),
     eyeSpringY: new Spring(0, 170, 16),
-    // Expressions
     smileFactor: 0,
     targetSmile: 0,
     curiousFactor: 0,
     targetCurious: 0,
     blissFactor: 0,
     targetBliss: 0,
-    // Scenario kinetics
     wobbleIntensity: 0,
-    // Drag Velocity Tracking for Fling
     dragLastX: 0,
     dragLastY: 0,
     dragLastTime: 0,
     dragVx: 0,
     dragVy: 0,
-    // Breath & Idle
     breathPhase: 0,
     smileTimeout: null,
     curiousTimeout: null,
     lastClickTime: 0
   });
 
-  // State for rendering SVG (updated smoothly in 60fps rAF)
   const [renderState, setRenderState] = useState({
     bodyPath: DEFAULT_BODY_PATH,
     faceOffset: { x: 0, y: 0 },
@@ -98,7 +87,6 @@ export function Companion({
     shadowOffsetX: 0
   });
 
-  // Handle Payment Scenario Shifts
   useEffect(() => {
     wakeUp();
     const a = animRef.current;
@@ -119,7 +107,7 @@ export function Companion({
       a.targetSmile = 0;
       a.targetCurious = 0;
       a.targetBliss = 0;
-      a.wobbleIntensity = 1; // trigger apologetic head-shake
+      a.wobbleIntensity = 1;
       stopNetworkSearchingSound();
     } else if (scenario === 'network') {
       startNetworkSearchingSound();
@@ -129,7 +117,6 @@ export function Companion({
       a.targetCurious = 1;
       a.wobbleIntensity = 0;
     } else {
-      // Neutral Reset
       stopNetworkSearchingSound();
       a.dragSpringY.setTarget(0);
       a.dragSpringX.setTarget(0);
@@ -142,7 +129,6 @@ export function Companion({
     }
   }, [scenario, wakeUp]);
 
-  // Trigger curious expression (single click / poke)
   const triggerCurious = useCallback(() => {
     wakeUp();
     playPokeSound(1.0 + (Math.random() - 0.5) * 0.2);
@@ -159,7 +145,6 @@ export function Companion({
     if (onInteract) onInteract('poke');
   }, [wakeUp, onInteract]);
 
-  // Trigger smile expression (double click)
   const triggerSmile = useCallback(() => {
     wakeUp();
     playSmileChime();
@@ -177,7 +162,6 @@ export function Companion({
     if (onInteract) onInteract('smile');
   }, [wakeUp, onInteract]);
 
-  // Pointer Down (Click / Drag start)
   const handlePointerDown = (e) => {
     e.preventDefault();
     wakeUp();
@@ -195,7 +179,6 @@ export function Companion({
     a.dragVx = 0;
     a.dragVy = 0;
 
-    // Capture pointer
     if (containerRef.current && containerRef.current.setPointerCapture) {
       try {
         containerRef.current.setPointerCapture(e.pointerId);
@@ -213,12 +196,10 @@ export function Companion({
     }
   };
 
-  // Track Petting & Drag velocity
   const handlePointerMove = (e) => {
     const ptr = pointerRef.current;
     const now = performance.now();
 
-    // 1. Drag Velocity Tracking
     if (ptr.isDragging) {
       const a = animRef.current;
       const dt = Math.max(1, now - a.dragLastTime) / 1000;
@@ -230,7 +211,6 @@ export function Companion({
       return;
     }
 
-    // 2. Petting Gesture Detection (when hovering over creature)
     if (ptr.distance < 110) {
       const pet = pettingRef.current;
       const dx = e.clientX - pet.lastX;
@@ -241,7 +221,6 @@ export function Companion({
         pet.lastDirection = dir;
         pet.lastStrokeTime = Date.now();
 
-        // After 3 gentle stroke reversals, trigger blissful purr state
         if (pet.reversals >= 3) {
           pet.isPetting = true;
           animRef.current.targetBliss = 1;
@@ -264,7 +243,6 @@ export function Companion({
       ptr.dragOffsetX = 0;
       ptr.dragOffsetY = 0;
 
-      // Fling momentum impulse injection on release
       const flingImpulseX = clamp(a.dragVx * 0.04, -35, 35);
       const flingImpulseY = clamp(a.dragVy * 0.04, -35, 35);
       a.dragSpringX.impulse(flingImpulseX);
@@ -272,7 +250,6 @@ export function Companion({
       a.dragSpringX.setTarget(0);
       a.dragSpringY.setTarget(0);
 
-      // Soft squash on fling release
       const speed = Math.sqrt(a.dragVx * a.dragVx + a.dragVy * a.dragVy);
       if (speed > 400) {
         a.squashSpring.snap(0.14);
@@ -289,7 +266,6 @@ export function Companion({
     animRef.current.dragSpringY.setTarget(0);
   };
 
-  // Keyboard accessibility
   const handleKeyDown = (e) => {
     wakeUp();
     if (e.key === ' ' || e.key === 'Enter') {
@@ -304,7 +280,6 @@ export function Companion({
     } else if (e.key === 's' || e.key === 'S') {
       triggerSmile();
     } else if (e.key === 'p' || e.key === 'P') {
-      // Pet keyboard shortcut
       animRef.current.targetBliss = 1;
       startPurr();
       setTimeout(() => {
@@ -322,7 +297,6 @@ export function Companion({
     }
   };
 
-  // React to Light Mote Absorption
   useEffect(() => {
     if (absorbedTrigger > 0) {
       wakeUp();
@@ -339,7 +313,6 @@ export function Companion({
     }
   }, [absorbedTrigger, wakeUp, onInteract]);
 
-  // 60FPS Animation Loop
   useEffect(() => {
     let animationFrameId;
     let lastTime = performance.now();
@@ -353,7 +326,6 @@ export function Companion({
       const idle = updateIdleState(currentTime);
       const saccade = saccadeGenRef.current.update(currentTime);
 
-      // Check petting timeout (stop purr if no motion for 600ms)
       const pet = pettingRef.current;
       if (pet.isPetting && Date.now() - pet.lastStrokeTime > 650) {
         pet.isPetting = false;
@@ -362,18 +334,15 @@ export function Companion({
         stopPurr();
       }
 
-      // 1. Natural Breathing
       const breathSpeed = isReducedMotion ? 0.8 : (1.4 + ptr.proximity * 0.8 + a.targetBliss * 0.5);
       a.breathPhase += dt * breathSpeed;
       const breathScaleY = Math.sin(a.breathPhase) * (0.024 + a.targetBliss * 0.02);
       const breathScaleX = -breathScaleY * 0.5;
 
-      // 2. Squash & Stretch physics
       const currentSquash = a.squashSpring.update(dt);
       const totalScaleX = 1 + breathScaleX + (isReducedMotion ? 0 : currentSquash * -0.7);
       const totalScaleY = 1 + breathScaleY + (isReducedMotion ? 0 : currentSquash);
 
-      // 3. Dragging Elastic Deformation
       if (ptr.isDragging) {
         const dragLimit = 75;
         const targetDx = clamp(ptr.dragOffsetX * 0.48, -dragLimit, dragLimit);
@@ -384,7 +353,6 @@ export function Companion({
       let curDragX = isReducedMotion ? 0 : a.dragSpringX.update(dt);
       let curDragY = isReducedMotion ? 0 : a.dragSpringY.update(dt);
 
-      // 4. Proximity & Lean physics
       let targetLeanX = 0;
       let targetLeanY = 0;
       if (!idle.isIdle && ptr.proximity > 0.05 && !pet.isPetting) {
@@ -396,40 +364,33 @@ export function Companion({
       let curLeanX = a.leanSpringX.update(dt);
       let curLeanY = a.leanSpringY.update(dt);
 
-      // Scenario Physics & Body Language Modifications
       const activeScenario = scenarioRef.current;
       if (activeScenario === 'success') {
-        // Buoyant joyful hovering bounce
         const buoyant = Math.sin(currentTime * 0.006) * 5;
         curDragY += buoyant;
       } else if (activeScenario === 'failure') {
-        // Apologetic lateral head-shake wobble
         if (a.wobbleIntensity > 0.005) {
           a.wobbleIntensity *= 0.988;
         }
         const headShake = Math.sin(currentTime * 0.018) * 13 * a.wobbleIntensity;
         curLeanX += headShake;
-        curDragY += 12; // apologetic sheepish droop
+        curDragY += 12;
       } else if (activeScenario === 'network') {
-        // Static jitter tremor in body
         const tremorX = (Math.sin(currentTime * 0.05) + Math.cos(currentTime * 0.08)) * 1.5;
         const tremorY = Math.sin(currentTime * 0.06) * 1.2;
         curDragX += tremorX;
         curDragY += tremorY;
-        curLeanX += 8; // attentive inquisitive tilt
+        curLeanX += 8;
       }
 
-      // 5. Gaze Calculation (Prioritizes floating Light Motes or Radar Sweep)
       let targetEyeX = 0;
       let targetEyeY = 0;
       const nearestMote = emotionRef?.current?.nearestMote;
 
       if (activeScenario === 'network') {
-        // Automated horizontal radar sweep searching for connection packets
         targetEyeX = Math.sin(currentTime * 0.0036) * 4.8;
         targetEyeY = 0;
       } else if (nearestMote && nearestMote.dist < 550 && !ptr.isDragging) {
-        // Look directly at the floating light mote!
         const dxM = nearestMote.x - (window.innerWidth / 2);
         const dyM = nearestMote.y - (window.innerHeight / 2);
         const angle = Math.atan2(dyM, dxM);
@@ -451,12 +412,10 @@ export function Companion({
       const curEyeX = a.eyeSpringX.update(dt);
       const curEyeY = a.eyeSpringY.update(dt);
 
-      // 6. Expression transitions
       a.smileFactor += (a.targetSmile - a.smileFactor) * 0.12;
       a.curiousFactor += (a.targetCurious - a.curiousFactor) * 0.14;
       a.blissFactor += (a.targetBliss - a.blissFactor) * 0.12;
 
-      // 7. Generate 8-point Organic Body Path
       const rx = a.baseRx * totalScaleX;
       const ry = a.baseRy * totalScaleY;
       const bodyDeform = {
@@ -472,13 +431,11 @@ export function Companion({
 
       const path = generateOrganicBodyPath(0, 0, rx, ry, bodyDeform);
 
-      // Face offset follows drag and lean
       const faceOffset = {
         x: curDragX * 0.45 + curLeanX * 0.7,
         y: curDragY * 0.45 + curLeanY * 0.7 + (currentSquash * 12)
       };
 
-      // 8. Compute Real-time Emotion Telemetry (Payment Scenario or Bio-resonance)
       let dominantEmotion = 'calm';
       if (activeScenario === 'success') {
         dominantEmotion = 'payment_success';
@@ -520,7 +477,6 @@ export function Companion({
         if (onEmotionChange) onEmotionChange(dominantEmotion);
       }
 
-      // Dynamic shadow physics
       const shadowScale = clamp(1 - (curDragY + curLeanY) * 0.0035, 0.65, 1.35);
       const shadowOffsetX = curDragX * 0.35 + curLeanX * 0.35;
 
@@ -549,27 +505,26 @@ export function Companion({
     };
   }, [isReducedMotion, updateIdleState]);
 
-  // Dynamic Scenario Body Color Palettes
   let creatureFill = theme.creatureColor || '#1e1e24';
   let creatureTopHighlight = theme.creatureHighlight || '#32323c';
   let accentColor = theme.accentBlush || '#e07a5f';
   let rimColor = 'rgba(255, 255, 255, 0.08)';
 
   if (scenario === 'success') {
-    creatureFill = '#132c20'; // Luxurious deep emerald obsidian
-    creatureTopHighlight = '#22553c'; // Radiant jade sheen
+    creatureFill = '#132c20';
+    creatureTopHighlight = '#22553c';
     accentColor = '#fb923c';
-    rimColor = 'rgba(52, 211, 153, 0.38)'; // Emerald ambient rim glow
+    rimColor = 'rgba(52, 211, 153, 0.38)';
   } else if (scenario === 'failure') {
-    creatureFill = '#2d181c'; // Deep warm velvety rosewood / espresso-wine
-    creatureTopHighlight = '#4a252c'; // Soft terracotta/rose sheen
+    creatureFill = '#2d181c';
+    creatureTopHighlight = '#4a252c';
     accentColor = '#f43f5e';
-    rimColor = 'rgba(251, 113, 133, 0.35)'; // Coral ambient rim glow
+    rimColor = 'rgba(251, 113, 133, 0.35)';
   } else if (scenario === 'network') {
-    creatureFill = '#101c28'; // Deep abyssal ocean / storm slate
-    creatureTopHighlight = '#1c344a'; // Electric cyan-tinged highlight
+    creatureFill = '#101c28';
+    creatureTopHighlight = '#1c344a';
     accentColor = '#06b6d4';
-    rimColor = 'rgba(6, 182, 212, 0.42)'; // Electric cyan ambient rim glow
+    rimColor = 'rgba(6, 182, 212, 0.42)';
   }
 
   return (
@@ -598,7 +553,6 @@ export function Companion({
             <stop offset="100%" stopColor="#0a0a0e" />
           </radialGradient>
 
-          {/* Dynamic Scenario Ambient Rim Glow */}
           <radialGradient id="body-rim-glow" cx="50%" cy="50%" r="50%">
             <stop offset="76%" stopColor={rimColor} stopOpacity="0" />
             <stop offset="94%" stopColor={rimColor} stopOpacity="0.75" />
@@ -612,7 +566,6 @@ export function Companion({
           </radialGradient>
         </defs>
 
-        {/* 1. Floor Ambient Contact Shadow */}
         <ellipse
           cx={renderState.shadowOffsetX}
           cy="88"
@@ -622,7 +575,6 @@ export function Companion({
           className="floor-shadow"
         />
 
-        {/* 2. Organic Deformable Base Body with Smooth Color Transition */}
         <path
           d={renderState.bodyPath || DEFAULT_BODY_PATH}
           fill={creatureFill}
@@ -630,7 +582,6 @@ export function Companion({
           style={{ transition: 'fill 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}
         />
 
-        {/* 3. Volumetric 3D Gradient Sheen */}
         <path
           d={renderState.bodyPath || DEFAULT_BODY_PATH}
           fill="url(#body-gradient)"
@@ -639,7 +590,6 @@ export function Companion({
           style={{ transition: 'opacity 0.6s ease' }}
         />
 
-        {/* 4. Dynamic Scenario Ambient Rim Glow Sheen */}
         {scenario !== 'none' && (
           <path
             d={renderState.bodyPath || DEFAULT_BODY_PATH}
@@ -650,7 +600,6 @@ export function Companion({
           />
         )}
 
-        {/* 5. Expressive Face Layer */}
         <CompanionFace
           eyeGaze={renderState.eyeGaze}
           saccade={renderState.saccade}
@@ -668,4 +617,3 @@ export function Companion({
     </div>
   );
 }
-

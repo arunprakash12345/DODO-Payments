@@ -1,6 +1,3 @@
-// Web Audio API Procedural Synthesizer for Little Companion
-// Generates soft organic micro-sounds without any external audio files.
-
 let audioCtx = null;
 let isAudioMuted = false;
 let purrOsc = null;
@@ -33,9 +30,6 @@ export function getAudioMuted() {
   return isAudioMuted;
 }
 
-/**
- * Play a gentle organic bubble/pop on single click / poke
- */
 export function playPokeSound(pitchMultiplier = 1.0) {
   if (isAudioMuted) return;
   const ctx = getAudioContext();
@@ -46,7 +40,6 @@ export function playPokeSound(pitchMultiplier = 1.0) {
   const gain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
 
-  // Gentle sine with lowpass warm timbre
   osc.type = 'sine';
   const startFreq = 220 * pitchMultiplier;
   const endFreq = 480 * pitchMultiplier;
@@ -69,15 +62,12 @@ export function playPokeSound(pitchMultiplier = 1.0) {
   osc.stop(now + 0.2);
 }
 
-/**
- * Play warm pentatonic double-chime on smile
- */
 export function playSmileChime() {
   if (isAudioMuted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
-  const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 major triad
+  const notes = [523.25, 659.25, 783.99];
   const now = ctx.currentTime;
 
   notes.forEach((freq, idx) => {
@@ -105,9 +95,6 @@ export function playSmileChime() {
   });
 }
 
-/**
- * Start organic purring vibration when petting
- */
 export function startPurr() {
   if (isAudioMuted || purrOsc) return;
   const ctx = getAudioContext();
@@ -118,9 +105,8 @@ export function startPurr() {
   purrGain = ctx.createGain();
   purrFilter = ctx.createBiquadFilter();
 
-  // Low frequency modulated purr
   purrOsc.type = 'triangle';
-  purrOsc.frequency.setValueAtTime(55, now); // A1 note
+  purrOsc.frequency.setValueAtTime(55, now);
 
   purrFilter.type = 'lowpass';
   purrFilter.frequency.setValueAtTime(140, now);
@@ -135,9 +121,6 @@ export function startPurr() {
   purrOsc.start(now);
 }
 
-/**
- * Stop purring sound smoothly
- */
 export function stopPurr() {
   if (!purrOsc || !audioCtx) return;
   try {
@@ -157,9 +140,6 @@ export function stopPurr() {
   }
 }
 
-/**
- * Play a delicate crystal droplet sound when a light mote is spawned
- */
 export function playMoteSpawnSound() {
   if (isAudioMuted) return;
   const ctx = getAudioContext();
@@ -184,16 +164,13 @@ export function playMoteSpawnSound() {
   osc.stop(now + 0.25);
 }
 
-/**
- * Play warm joyful chime sweep when companion absorbs a light mote
- */
 export function playMoteAbsorbSound() {
   if (isAudioMuted) return;
   const ctx = getAudioContext();
   if (!ctx) return;
 
   const now = ctx.currentTime;
-  const freqs = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6 arpeggio
+  const freqs = [523.25, 659.25, 783.99, 1046.5];
 
   freqs.forEach((f, idx) => {
     const osc = ctx.createOscillator();
@@ -220,10 +197,6 @@ export function playMoteAbsorbSound() {
   });
 }
 
-/**
- * 1. PAYMENT SUCCESS CHIME
- * Radiant ascending pentatonic bell chime with shimmering harmonics (C5 -> E5 -> G5 -> C6 -> E6).
- */
 export function playPaymentSuccessSound() {
   if (isAudioMuted) return;
   const ctx = getAudioContext();
@@ -231,11 +204,11 @@ export function playPaymentSuccessSound() {
 
   const now = ctx.currentTime;
   const notes = [
-    { freq: 523.25, time: 0.00, dur: 0.65, gain: 0.07 }, // C5
-    { freq: 659.25, time: 0.08, dur: 0.70, gain: 0.08 }, // E5
-    { freq: 783.99, time: 0.16, dur: 0.85, gain: 0.09 }, // G5
-    { freq: 1046.50, time: 0.25, dur: 1.10, gain: 0.10 }, // C6
-    { freq: 1318.51, time: 0.35, dur: 1.30, gain: 0.08 }  // E6 high sparkle
+    { freq: 523.25, time: 0.00, dur: 0.65, gain: 0.07 },
+    { freq: 659.25, time: 0.08, dur: 0.70, gain: 0.08 },
+    { freq: 783.99, time: 0.16, dur: 0.85, gain: 0.09 },
+    { freq: 1046.50, time: 0.25, dur: 1.10, gain: 0.10 },
+    { freq: 1318.51, time: 0.35, dur: 1.30, gain: 0.08 }
   ];
 
   notes.forEach(({ freq, time, dur, gain: noteGain }) => {
@@ -263,11 +236,6 @@ export function playPaymentSuccessSound() {
   });
 }
 
-/**
- * 2. PAYMENT FAILED / "OOPS" SOUND
- * Soft, sympathetic, pillowy descending minor third (soft acoustic thud: G3 -> E3).
- * Gentle, human, apologetic — not an alarming buzzer.
- */
 export function playPaymentFailedSound() {
   if (isAudioMuted) return;
   const ctx = getAudioContext();
@@ -305,10 +273,6 @@ export function playPaymentFailedSound() {
   });
 }
 
-/**
- * 3. NETWORK SEARCHING SONAR PING
- * Rhythmic soft sonar radar blip pinging the ether for connection.
- */
 let networkPingTimer = null;
 
 export function startNetworkSearchingSound() {

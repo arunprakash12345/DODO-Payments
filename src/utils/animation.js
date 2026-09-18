@@ -1,5 +1,3 @@
-// Advanced Animation & Spring Physics Engine for Little Companion
-
 export function lerp(a, b, t) {
   return a + (b - a) * t;
 }
@@ -14,9 +12,6 @@ export function distance(x1, y1, x2, y2) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-/**
- * High-performance Spring Physics Simulator with velocity impulse
- */
 export class Spring {
   constructor(initial = 0, stiffness = 180, damping = 12) {
     this.current = initial;
@@ -41,7 +36,6 @@ export class Spring {
   }
 
   update(dt = 1 / 60) {
-    // Semi-implicit Euler integration for rock-solid stability
     const force = -this.stiffness * (this.current - this.target);
     const dampingForce = -this.damping * this.velocity;
     const acceleration = force + dampingForce;
@@ -53,9 +47,6 @@ export class Spring {
   }
 }
 
-/**
- * Micro-saccade generator for lifelike involuntary eye tremor
- */
 export class MicroSaccade {
   constructor() {
     this.offsetX = 0;
@@ -67,7 +58,6 @@ export class MicroSaccade {
 
   update(now) {
     if (now > this.nextTremorTime) {
-      // Small saccade displacement (0.3 to 0.7px)
       const angle = Math.random() * Math.PI * 2;
       const mag = Math.random() * 0.55;
       this.targetX = Math.cos(angle) * mag;
@@ -82,9 +72,6 @@ export class MicroSaccade {
   }
 }
 
-/**
- * Generates an 8-point deformable organic superellipse SVG path.
- */
 export function generateOrganicBodyPath(cx, cy, rx, ry, deform = {}) {
   const safeRx = Math.max(10, (typeof rx === 'number' && !isNaN(rx)) ? rx : 76);
   const safeRy = Math.max(10, (typeof ry === 'number' && !isNaN(ry)) ? ry : 82);
@@ -98,17 +85,14 @@ export function generateOrganicBodyPath(cx, cy, rx, ry, deform = {}) {
   const dxL = (typeof deform.leftX === 'number' && !isNaN(deform.leftX)) ? deform.leftX : 0;
   const dyL = (typeof deform.leftY === 'number' && !isNaN(deform.leftY)) ? deform.leftY : 0;
 
-  // 4 cardinal points with deformation
   const top = { x: cx + dxT, y: cy - safeRy + dyT };
   const right = { x: cx + safeRx + dxR, y: cy + dyR };
   const bottom = { x: cx + dxB, y: cy + safeRy + dyB };
   const left = { x: cx - safeRx + dxL, y: cy + dyL };
 
-  // Bezier control point constants for organic rounded silicone
   const kX = safeRx * 0.552;
   const kY = safeRy * 0.552;
 
-  // 4 smooth cubic Bezier segments
   const path = [
     `M ${top.x} ${top.y}`,
     `C ${top.x + kX} ${top.y}, ${right.x} ${right.y - kY}, ${right.x} ${right.y}`,
@@ -121,9 +105,6 @@ export function generateOrganicBodyPath(cx, cy, rx, ry, deform = {}) {
   return path;
 }
 
-/**
- * Generates dynamic SVG path for mouth based on expression factor
- */
 export function generateMouthPath(factorSmile = 0, factorCurious = 0, factorBliss = 0) {
   const neutralWidth = 14;
   const smileWidth = 19;
@@ -148,6 +129,5 @@ export function generateMouthPath(factorSmile = 0, factorCurious = 0, factorBlis
     return `M ${-w / 2} 0 Q 0 ${drop} ${w / 2} 0`;
   }
 
-  // Neutral gentle line with micro-curve
   return `M ${-neutralWidth / 2} 0 Q 0 0.8 ${neutralWidth / 2} 0`;
 }

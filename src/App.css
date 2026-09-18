@@ -1,8 +1,3 @@
-/* ==========================================================================
-   LITTLE COMPANION — DESIGN SYSTEM & APPLICATION STYLES
-   Minimal, Tactile, Living Digital Entity
-   ========================================================================== */
-
 .companion-app {
   width: 100vw;
   height: 100vh;
@@ -17,10 +12,6 @@
   transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1),
               color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-/* ==========================================================================
-   CREATIVE INTERACTIVE BACKGROUND
-   ========================================================================== */
 
 .creative-background-container {
   position: absolute;
@@ -43,7 +34,6 @@
   display: block;
 }
 
-/* Studio Vignette Depth */
 .studio-vignette {
   position: absolute;
   top: 0;
@@ -58,7 +48,6 @@
   pointer-events: none;
 }
 
-/* Editorial Studio Marks & Crosshairs */
 .studio-marks {
   position: absolute;
   top: 0;
@@ -109,7 +98,6 @@
   transform-origin: right center;
 }
 
-/* Paper Grain Overlay */
 .paper-grain {
   position: absolute;
   top: 0;
@@ -121,10 +109,6 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* ==========================================================================
-   TOP UTILITIES BAR
-   ========================================================================== */
-
 .top-utilities {
   position: absolute;
   top: 1.5rem;
@@ -135,7 +119,6 @@
   z-index: 50;
 }
 
-/* Meta Design System: Live Emotional Resonance Pill */
 .emotion-status-pill {
   display: inline-flex;
   align-items: center;
@@ -210,7 +193,6 @@
   }
 }
 
-
 .utility-btn {
   display: inline-flex;
   align-items: center;
@@ -247,10 +229,6 @@
   color: var(--accent-blush);
 }
 
-/* ==========================================================================
-   EDITORIAL HEADER
-   ========================================================================== */
-
 .companion-header {
   display: flex;
   flex-direction: column;
@@ -277,10 +255,6 @@
   letter-spacing: 0.05em;
   color: var(--text-subtle);
 }
-
-/* ==========================================================================
-   CENTRAL STAGE & INTERACTIVE COMPANION
-   ========================================================================== */
 
 .stage-area {
   flex: 1;
@@ -322,10 +296,6 @@
   filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.08));
   pointer-events: none;
 }
-
-/* ==========================================================================
-   DODO PAYMENTS: DEDICATED SCENARIO SWITCHER DOCK
-   ========================================================================== */
 
 .payment-scenario-bar {
   display: flex;
@@ -377,7 +347,6 @@
   font-weight: 600;
 }
 
-/* Active Scenario Styles */
 .scenario-btn.btn-success.active {
   background: rgba(16, 185, 129, 0.14);
   color: #047857;
@@ -423,10 +392,6 @@
   border-color: rgba(0, 0, 0, 0.12);
 }
 
-/* ==========================================================================
-   FOOTER HINTS
-   ========================================================================== */
-
 .companion-footer {
   display: flex;
   flex-direction: column;
@@ -434,7 +399,6 @@
   z-index: 10;
   pointer-events: none;
 }
-
 
 .hints-row {
   display: flex;
@@ -476,7 +440,6 @@
   font-size: 0.75rem;
 }
 
-/* Responsive adjustments */
 @media (max-width: 640px) {
   .top-utilities {
     top: 1rem;
