@@ -4,23 +4,26 @@ An interactive, emotional companion designed for payment feedback states. Explor
 
 ---
 
-## Why I Built This
+## What is This?
 
-Payment interactions often carry emotional weight: excitement when completing an order, anxiety when a transaction declines, and confusion during connection drops. In most web applications, these states are relegated to cold spinners, red banners, or generic alert modals.
+**Dodo Companion** is an interactive design engineering experiment that turns payment feedback into a living digital toy. Instead of relying on static alerts, error modals, or spinning loaders, it uses real-time physics, continuous gaze tracking, organic SVG deformation, and procedural audio synthesis to communicate payment status through intuitive body language and ambient visuals.
 
-I built **Dodo Companion** with a clear design motto: **Useful, Inclusive, and Accessible**.
+---
 
-Instead of treating payment states as static text, this project reimagines payment feedback as a living, empathetic companion that reflects system state through organic body language, gaze, color atmosphere, and procedural sound.
+## Why I Did This
 
-### Core Intentions:
-- **Focused on the Essential Cases**: Rather than unnecessary complexity, the focus is squarely on the 3 most crucial payment scenarios—**Success (`200`)**, **Declined/Failure (`402`)**, and **Network Connectivity Issues (`408`)**, plus a natural standby state.
-- **Accessible & Inclusive by Default**:
-  - Full keyboard accessibility: every interaction, gaze direction, and payment state can be triggered entirely from the keyboard.
-  - ARIA attributes and high-contrast emotional status indicators displaying real HTTP status codes.
-  - Respects `prefers-reduced-motion` media queries for motion sensitivity.
-  - Sound can be easily muted or unmuted anytime (`M` key or top utility button) to respect quiet or sensory-sensitive environments.
-- **Interactive Toy / Playfulness**:
-  - Includes a playful light-mote mechanic: tapping anywhere on the canvas drops floating motes that the companion tracks with its eyes and absorbs, alongside poking, petting, and stretching physics.
+Payment moments carry significant emotional weight: relief and excitement when an order succeeds, frustration when a card is declined, and uncertainty when the network drops. In modern fintech interfaces, these moments are often handled by cold, unhelpful text banners.
+
+I created this project with a guiding motto: **Useful, Inclusive, and Accessible**.
+
+### Design Philosophy:
+- **Focused on the Essential Scenarios**: Rather than adding unnecessary complexity, the project focuses deeply on the 3 vital payment cases—**Success (`200 OK`)**, **Declined/Failure (`402 Error`)**, and **Network Connectivity Issues (`408 Timeout`)**, alongside a natural resting standby state.
+- **Accessible by Design**:
+  - **Full Keyboard Navigation**: Every state, gesture, and gaze direction can be operated without a mouse (keys `1`, `2`, `3`, `0`, `P`, `S`, `Space`, `Arrow Keys`).
+  - **Sensory & Motion Considerations**: Respects `prefers-reduced-motion` media queries and provides an instant sound mute toggle (`M` key) so audio never feels intrusive.
+  - **Semantic Feedback**: Includes live status indicators with official HTTP status codes for clarity.
+- **Playful & Tactile**:
+  - Includes an interactive light-mote mini-toy: clicking the canvas drops floating motes that the companion actively tracks with its eyes and absorbs, alongside natural poking, petting, and stretching physics.
 
 ---
 
@@ -45,6 +48,27 @@ Instead of treating payment states as static text, this project reimagines payme
 - **Petting**: Stroking back and forth triggers blissful purring vibrations and radiating cymatics.
 - **Drag & Fling**: Elastic silicone body pulls toward the pointer with momentum impulse upon release.
 - **Feed Light Motes**: Clicking anywhere on the background spawns light motes that drift toward the companion for absorption.
+
+---
+
+## What I Would Do With More Time
+
+If given more time to expand this into a production-grade system for Dodo Payments, here are the next directions I would pursue:
+
+1. **Drop-in Checkout SDK / Web Component**  
+   Package the companion into a lightweight, zero-dependency npm package (`<DodoCompanion status={paymentStatus} />`) that merchants can drop directly into checkout modals and hosted payment pages.
+
+2. **Real-Time Webhook & WebSocket Integration**  
+   Connect live payment gateway events (via Webhooks or Server-Sent Events) so the companion automatically reacts to real-time asynchronous settlement and 3D Secure verification flows.
+
+3. **Mobile Haptic Feedback API**  
+   Integrate the Web Vibration API (`navigator.vibrate`) on mobile devices to produce crisp physical haptics that match the procedural sound chimes during success, failure, and petting.
+
+4. **Multi-Touch & Gyroscope Physics**  
+   Add two-finger pinch-to-squash gestures and device tilt parallax (via `DeviceOrientationEvent`) so the creature balances naturally when users tilt their phones.
+
+5. **Merchant Brand Customization Presets**  
+   Allow merchants to configure brand color tokens, custom voice/chime scales, and accessory variations while keeping the core accessible physics intact.
 
 ---
 
