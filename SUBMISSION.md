@@ -2,7 +2,7 @@
 
 **Project Title:** Dodo Companion — Emotional Payment Feedback Toy  
 **Live Demo:** [Deploy Link / http://localhost:5173]  
-**Repository:** [Source Code Link]
+**Repository:** https://github.com/arunprakash12345/DODO-Payments  
 
 ---
 
